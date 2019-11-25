@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/atlassian/go-artifactory/v2/artifactory"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -22,7 +22,7 @@ resource "artifactory_replication_config" "lib-local" {
 	repo_key = "${artifactory_local_repository.lib-local.key}"
 	cron_exp = "0 0 * * * ?"
 	enable_event_replication = true
-	
+
 	replications = [
 		{
 			url = "%s"

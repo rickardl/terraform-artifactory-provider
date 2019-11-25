@@ -1,0 +1,9 @@
+version: "2"
+
+tasks:
+  install:
+    cmds:
+      - go build
+      - chmod +x terraform-provider-artifactory
+      - mkdir -p ~/.terraform.d/plugins/darwin_amd64/
+      - mv terraform-provider-artifactory ~/.terraform.d/plugins/darwin_amd64/

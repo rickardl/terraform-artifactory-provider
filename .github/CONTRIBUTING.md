@@ -58,4 +58,4 @@ go-artifactory endeavours to avoid external dependencies.
 ## Make changes to the Pipelines build
 go-stride uses Bitbucket Pipelines for it's continuous integration. The build scripts are defined in `bitbucket-pipelines.yml`.
 
-[IssueTracker]: https://github.com/atlassian/terraform-provider-artifactory/issues
+[IssueTracker]: https://terraform-artifactory-provider/issues

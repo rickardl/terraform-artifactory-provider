@@ -6,8 +6,8 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"net/http"
 
-	"github.com/atlassian/go-artifactory/v2/artifactory"
-	v2 "github.com/atlassian/go-artifactory/v2/artifactory/v2"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
+	v2 "github.com/rickardl/go-artifactory/v2/artifactory/v2"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 )

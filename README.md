@@ -1,6 +1,6 @@
 # Terraform Provider Artifactory
-[![Actions Status](https://github.com/atlassian/terraform-provider-artifactory/workflows/build/badge.svg)](https://github.com/atlassian/terraform-provider-artifactory/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/atlassian/terraform-provider-artifactory)](https://goreportcard.com/report/github.com/atlassian/terraform-provider-artifactory)
+[![Actions Status](https://terraform-artifactory-provider/workflows/build/badge.svg)](https://terraform-artifactory-provider/actions)
+[![Go Report Card](https://goreportcard.com/badge/terraform-artifactory-provider)](https://goreportcard.com/report/terraform-artifactory-provider)
 
 ## Build the Provider
 If you're building the provider, follow the instructions to [install it as a plugin](https://www.terraform.io/docs/plugins/basics.html#installing-a-plugin).
@@ -10,18 +10,18 @@ Requirements:
 - [Terraform](https://www.terraform.io/downloads.html) 0.11
 - [Go](https://golang.org/doc/install) 1.11+ (to build the provider plugin)
 
-Clone repository to: `$GOPATH/src/github.com/atlassian/terraform-provider-artifactory`
+Clone repository to: `$GOPATH/src/terraform-artifactory-provider`
 
 Enter the provider directory and build the provider
 
 ```sh
-cd $GOPATH/src/github.com/atlassian/terraform-provider-artifactory
+cd $GOPATH/src/terraform-artifactory-provider
 go build
 ```
 
 To install the provider
 ```sh
-cd $GOPATH/src/github.com/atlassian/terraform-provider-artifactory
+cd $GOPATH/src/terraform-artifactory-provider
 go install
 ```
 

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/atlassian/go-artifactory/v2/artifactory"
-	"github.com/atlassian/go-artifactory/v2/artifactory/transport"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
+	"github.com/rickardl/go-artifactory/v2/artifactory/transport"
 )
 
 // Artifactory Provider that supports configuration via username+password or a token
@@ -75,6 +75,7 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"artifactory_file":     dataSourceArtifactoryFile(),
 			"artifactory_fileinfo": dataSourceArtifactoryFileInfo(),
+			"artifactory_group":    dataSourceArtifactoryGroup(),
 		},
 
 		ConfigureFunc: providerConfigure,

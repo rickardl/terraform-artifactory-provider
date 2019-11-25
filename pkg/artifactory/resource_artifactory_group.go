@@ -3,12 +3,13 @@ package artifactory
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform/helper/resource"
 	"net/http"
 
-	"github.com/atlassian/go-artifactory/v2/artifactory"
-	"github.com/atlassian/go-artifactory/v2/artifactory/v1"
+	"github.com/hashicorp/terraform/helper/resource"
+
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
+	ui "github.com/rickardl/go-artifactory/v2/artifactory/ui"
 )
 
 func resourceArtifactoryGroup() *schema.Resource {
@@ -53,14 +54,19 @@ func resourceArtifactoryGroup() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"user_names": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+			},
 		},
 	}
 }
 
-func unmarshalGroup(s *schema.ResourceData) (*v1.Group, error) {
+func unmarshalGroup(s *schema.ResourceData) (*ui.Group, error) {
 	d := &ResourceData{s}
 
-	group := new(v1.Group)
+	group := new(ui.Group)
 
 	group.Name = d.getStringRef("name", false)
 	group.Description = d.getStringRef("description", false)
@@ -68,6 +74,7 @@ func unmarshalGroup(s *schema.ResourceData) (*v1.Group, error) {
 	group.AdminPrivileges = d.getBoolRef("admin_privileges", false)
 	group.Realm = d.getStringRef("realm", false)
 	group.RealmAttributes = d.getStringRef("realm_attributes", false)
+	group.UserNames = d.getListRef("userNames")
 
 	// Validator
 	if group.AdminPrivileges != nil && group.AutoJoin != nil && *group.AdminPrivileges && *group.AutoJoin {
@@ -86,7 +93,7 @@ func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	_, err = c.V1.Security.CreateOrReplaceGroup(context.Background(), *group.Name, group)
+	_, err = c.UI.Security.CreateGroup(context.Background(), group)
 
 	if err != nil {
 		return err
@@ -130,6 +137,8 @@ func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
 	logError(d.Set("admin_privileges", group.AdminPrivileges))
 	logError(d.Set("realm", group.Realm))
 	logError(d.Set("realm_attributes", group.RealmAttributes))
+	logError(d.Set("userNames", group.UserNames))
+
 	if hasErr {
 		return fmt.Errorf("failed to marshal group")
 	}
@@ -142,7 +151,7 @@ func resourceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.V1.Security.UpdateGroup(context.Background(), d.Id(), group)
+	_, err = c.UI.Security.UpdateGroup(context.Background(), d.Id(), group)
 	if err != nil {
 		return err
 	}
