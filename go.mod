@@ -5,7 +5,6 @@ replace github.com/rickardl/go-artifactory/v2 => /Users/rickardlofstrom/rickardl
 require (
 	cloud.google.com/go v0.49.0 // indirect
 	cloud.google.com/go/storage v1.4.0 // indirect
-	github.com/rickardl/terraform-artifactory-provider v1.6.3
 	github.com/aws/aws-sdk-go v1.25.42 // indirect
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
