@@ -68,14 +68,13 @@ func Provider() terraform.ResourceProvider {
 			"artifactory_replication_config":        resourceArtifactoryReplicationConfig(),
 			"artifactory_single_replication_config": resourceArtifactorySingleReplicationConfig(),
 			"artifactory_certificate":               resourceArtifactoryCertificate(),
-			// Deprecated. Remove in V3
-			"artifactory_permission_targets": resourceArtifactoryPermissionTargets(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"artifactory_file":     dataSourceArtifactoryFile(),
-			"artifactory_fileinfo": dataSourceArtifactoryFileInfo(),
-			"artifactory_group":    dataSourceArtifactoryGroup(),
+			"artifactory_file":             dataSourceArtifactoryFile(),
+			"artifactory_fileinfo":         dataSourceArtifactoryFileInfo(),
+			"artifactory_group":            dataSourceArtifactoryGroup(),
+			"artifactory_local_repository": dataSourceArtifactoryLocalRepository(),
 		},
 
 		ConfigureFunc: providerConfigure,

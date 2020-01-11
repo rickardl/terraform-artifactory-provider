@@ -3,6 +3,7 @@ package artifactory
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -92,7 +93,6 @@ func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = c.UI.Security.CreateGroup(context.Background(), group)
 
 	if err != nil {
@@ -118,7 +118,9 @@ func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
 
-	group, resp, err := c.V1.Security.GetGroup(context.Background(), d.Id())
+	group, resp, err := c.UI.Security.GetGroup(context.Background(), d.Id())
+
+	log.Printf("[DEBUG] Find Group: %s", d.Id())
 
 	// If we 404 it is likely the resources was externally deleted
 	// If the ID is updated to blank, this tells Terraform the resource no longer exist

@@ -17,11 +17,11 @@ func dataSourceArtifactoryGroup() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"auto_join": {
 				Type:     schema.TypeBool,
@@ -42,11 +42,13 @@ func dataSourceArtifactoryGroup() *schema.Resource {
 			"realm_attributes": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"user_names": {
 				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
+				Computed: true,
 			},
 		},
 	}

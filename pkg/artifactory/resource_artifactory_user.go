@@ -5,12 +5,13 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/rickardl/go-artifactory/v2/artifactory"
-	"github.com/rickardl/go-artifactory/v2/artifactory/v1"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
 	"math/rand"
 	"net/http"
+
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
+	v1 "github.com/rickardl/go-artifactory/v2/artifactory/v1"
 )
 
 const randomPasswordLength = 16
@@ -21,6 +22,7 @@ func resourceArtifactoryUser() *schema.Resource {
 		Read:   resourceUserRead,
 		Update: resourceUserUpdate,
 		Delete: resourceUserDelete,
+		Exists: resourceUserExists,
 
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -166,6 +168,20 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return packUser(user, d)
+}
+
+func resourceUserExists(d *schema.ResourceData, m interface{}) (bool, error) {
+	c := m.(*artifactory.Artifactory)
+
+	userId := d.Id()
+	_, resp, err := c.V1.Security.GetUser(context.Background(), userId)
+	if resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {

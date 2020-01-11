@@ -6,42 +6,13 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"net/http"
 
-	"github.com/rickardl/go-artifactory/v2/artifactory"
-	v2 "github.com/rickardl/go-artifactory/v2/artifactory/v2"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
+	v2 "github.com/rickardl/go-artifactory/v2/artifactory/v2"
 )
 
-func resourceArtifactoryPermissionTargets() *schema.Resource {
-	resource := resourceArtifactoryPermissionTarget()
-	resource.DeprecationMessage = "Since v1.5. Use artifactory_permission_target"
-	return resource
-}
-
 func resourceArtifactoryPermissionTarget() *schema.Resource {
-	principalSchemaV1 := schema.Schema{
-		Type:          schema.TypeSet,
-		Optional:      true,
-		Deprecated:    "Since Artifactory 6.6.0+. Use /api/v2 endpoint",
-		ConflictsWith: []string{"repo", "build"},
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"name": {
-					Type:     schema.TypeString,
-					Required: true,
-					// Required as it is impossible to remove a principal as the absence of one does not
-					// count as a deletion
-					ForceNew: true,
-				},
-				"permissions": {
-					Type:     schema.TypeSet,
-					Elem:     &schema.Schema{Type: schema.TypeString},
-					Set:      schema.HashString,
-					Required: true,
-				},
-			},
-		},
-	}
 
 	actionSchema := schema.Schema{
 		Type:     schema.TypeSet,
@@ -73,11 +44,10 @@ func resourceArtifactoryPermissionTarget() *schema.Resource {
 	}
 
 	principalSchema := schema.Schema{
-		Type:          schema.TypeList,
-		ConflictsWith: []string{"repositories"},
-		Optional:      true,
-		MaxItems:      1,
-		MinItems:      1,
+		Type:     schema.TypeList,
+		Optional: true,
+		MaxItems: 1,
+		MinItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"includes_pattern": {
@@ -133,32 +103,6 @@ func resourceArtifactoryPermissionTarget() *schema.Resource {
 			},
 			"repo":  &principalSchema,
 			"build": &principalSchema,
-
-			// Legacy V1 Fields
-			"includes_pattern": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Default:       "**",
-				Deprecated:    "Since Artifactory 6.6.0+ (provider 1.5). Use /api/v2 endpoint",
-				ConflictsWith: []string{"repo", "build"},
-			},
-			"excludes_pattern": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Default:       "",
-				Deprecated:    "Since Artifactory 6.6.0+ (provider 1.5). Use /api/v2 endpoint",
-				ConflictsWith: []string{"repo", "build"},
-			},
-			"repositories": {
-				Type:          schema.TypeSet,
-				Elem:          &schema.Schema{Type: schema.TypeString},
-				Set:           schema.HashString,
-				Optional:      true,
-				Deprecated:    "Since Artifactory 6.6.0+ (provider 1.5). Use /api/v2 endpoint",
-				ConflictsWith: []string{"repo", "build"},
-			},
-			"users":  &principalSchemaV1,
-			"groups": &principalSchemaV1,
 		},
 	}
 }
@@ -315,10 +259,6 @@ func packPermissionTarget(permissionTarget *v2.PermissionTarget, d *schema.Resou
 func resourcePermissionTargetCreate(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
 
-	if _, ok := d.GetOk("repositories"); ok {
-		return resourcePermissionTargetV1CreateOrReplace(d, m)
-	}
-
 	permissionTarget := unpackPermissionTarget(d)
 
 	_, err := c.V2.Security.CreatePermissionTarget(context.Background(), *permissionTarget.Name, permissionTarget)
@@ -345,10 +285,6 @@ func resourcePermissionTargetCreate(d *schema.ResourceData, m interface{}) error
 func resourcePermissionTargetRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
 
-	if _, ok := d.GetOk("repositories"); ok {
-		return resourcePermissionTargetV1Read(d, m)
-	}
-
 	permissionTarget, resp, err := c.V2.Security.GetPermissionTarget(context.Background(), d.Id())
 	if resp.StatusCode == http.StatusNotFound {
 		d.SetId("")
@@ -363,10 +299,6 @@ func resourcePermissionTargetRead(d *schema.ResourceData, m interface{}) error {
 func resourcePermissionTargetUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
 
-	if _, ok := d.GetOk("repositories"); ok {
-		return resourcePermissionTargetV1CreateOrReplace(d, m)
-	}
-
 	permissionTarget := unpackPermissionTarget(d)
 	if _, err := c.V2.Security.UpdatePermissionTarget(context.Background(), d.Id(), permissionTarget); err != nil {
 		return err
@@ -379,10 +311,6 @@ func resourcePermissionTargetUpdate(d *schema.ResourceData, m interface{}) error
 func resourcePermissionTargetDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
 
-	if _, ok := d.GetOk("repositories"); ok {
-		return resourcePermissionTargetV1Delete(d, m)
-	}
-
 	permissionTarget := unpackPermissionTarget(d)
 	resp, err := c.V2.Security.DeletePermissionTarget(context.Background(), *permissionTarget.Name)
 
@@ -394,17 +322,6 @@ func resourcePermissionTargetDelete(d *schema.ResourceData, m interface{}) error
 
 func resourcePermissionTargetExists(d *schema.ResourceData, m interface{}) (bool, error) {
 	c := m.(*artifactory.Artifactory)
-
-	if _, ok := d.GetOk("repositories"); ok {
-		_, resp, err := c.V1.Security.GetPermissionTargets(context.Background(), d.Id())
-
-		if resp.StatusCode == http.StatusNotFound {
-			return false, nil
-		} else if err != nil {
-			return false, fmt.Errorf("error: Request failed: %s", err.Error())
-		}
-		return true, nil
-	}
 
 	return c.V2.Security.HasPermissionTarget(context.Background(), d.Id())
 }

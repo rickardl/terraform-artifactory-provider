@@ -5,8 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/rickardl/go-artifactory/v2/artifactory"
+	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
 )
 
 type ResourceData struct{ *schema.ResourceData }
@@ -87,4 +88,9 @@ func cascadingErr(hasErr *bool) func(error) {
 			*hasErr = true
 		}
 	}
+}
+
+func hashPrincipal(o interface{}) int {
+	p := o.(map[string]interface{})
+	return hashcode.String(p["name"].(string)) + 31*hashcode.String(hashcode.Strings(castToStringArr(p["permissions"].(*schema.Set).List())))
 }
