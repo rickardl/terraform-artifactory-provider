@@ -4,18 +4,29 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
+var testAccProviderFactories func(providers *[]*schema.Provider) map[string]terraform.ResourceProviderFactory
 var testAccProvider *schema.Provider
+var testAccProviderFunc func() *schema.Provider
 
 func init() {
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
-		"artifactory": testAccProvider,
+		"artifactory": testAccProvider}
+	testAccProviderFactories = func(providers *[]*schema.Provider) map[string]terraform.ResourceProviderFactory {
+		return map[string]terraform.ResourceProviderFactory{
+			"aws": func() (terraform.ResourceProvider, error) {
+				p := Provider()
+				*providers = append(*providers, p.(*schema.Provider))
+				return p, nil
+			},
+		}
 	}
+	testAccProviderFunc = func() *schema.Provider { return testAccProvider }
 }
 
 func TestProvider(t *testing.T) {

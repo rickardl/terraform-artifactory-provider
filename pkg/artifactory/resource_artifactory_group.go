@@ -120,7 +120,7 @@ func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
 
 	group, resp, err := c.UI.Security.GetGroup(context.Background(), d.Id())
 
-	log.Printf("[DEBUG] Find Group: %s", d.Id())
+	log.Printf("[DEBUG] Find Group: %v", d.Id())
 
 	// If we 404 it is likely the resources was externally deleted
 	// If the ID is updated to blank, this tells Terraform the resource no longer exist

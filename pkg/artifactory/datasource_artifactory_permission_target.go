@@ -1,8 +1,13 @@
 package artifactory
 
 import (
+	"context"
+	"log"
+	"net/http"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
 	v2 "github.com/rickardl/go-artifactory/v2/artifactory/v2"
 )
 
@@ -80,21 +85,33 @@ func dataSourceArtifactoryPermissionTarget() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Read:   resourcePermissionTargetRead,
-		Exists: resourcePermissionTargetExists,
-
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
+		Read: dataPermissionTargetRead,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"repo":  &principalSchema,
 			"build": &principalSchema,
 		},
 	}
+}
+
+func dataPermissionTargetRead(d *schema.ResourceData, m interface{}) error {
+	c := m.(*artifactory.Artifactory)
+
+	name := d.Get("name").(string)
+	log.Printf("[DEBUG] Reading Perssmion Target with name: %s", name)
+
+	permissionTarget, resp, err := c.V2.Security.GetPermissionTarget(context.Background(), name)
+	if resp.StatusCode == http.StatusNotFound {
+		d.SetId("")
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	d.SetId(*permissionTarget.Name)
+	return packPermissionTarget(permissionTarget, d)
 }

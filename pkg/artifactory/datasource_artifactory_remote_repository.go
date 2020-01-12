@@ -1,31 +1,28 @@
 package artifactory
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
 )
 
 func dataSourceArtifactoryRemoteRepository() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceRemoteRepositoryCreate,
-		Read:   resourceRemoteRepositoryRead,
-
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
+		Read: dataRemoteRepositoryRead,
 
 		Schema: map[string]*schema.Schema{
 			"key": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"package_type": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
@@ -272,4 +269,21 @@ func dataSourceArtifactoryRemoteRepository() *schema.Resource {
 			},
 		},
 	}
+}
+
+func dataRemoteRepositoryRead(d *schema.ResourceData, m interface{}) error {
+	c := m.(*artifactory.Artifactory)
+
+	key := d.Get("key").(string)
+	log.Printf("[DEBUG] Reading Local Repository with Key: %s", key)
+
+	repo, resp, err := c.V1.Repositories.GetRemote(context.Background(), key)
+	if resp.StatusCode == http.StatusNotFound {
+		d.SetId("")
+		return nil
+	} else if err != nil {
+		return err
+	}
+	d.SetId(*repo.Key)
+	return packRemoteRepo(repo, d)
 }

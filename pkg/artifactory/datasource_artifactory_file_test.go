@@ -1,4 +1,4 @@
-package artifactory
+package artifactory_test
 
 import (
 	"github.com/stretchr/testify/assert"

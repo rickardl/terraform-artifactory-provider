@@ -10,19 +10,11 @@ require (
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
-	github.com/hashicorp/go-plugin v1.0.1 // indirect
-	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.1.0 // indirect
-	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
-	github.com/hashicorp/terraform v0.12.16
-	github.com/hashicorp/terraform-config-inspect v0.0.0-20191121111010-e9629612a215 // indirect
-	github.com/hashicorp/terraform-svchost v0.0.0-20191119180714-d2e4933b9136 // indirect
-	github.com/hashicorp/yamux v0.0.0-20190923154419-df201c70410d // indirect
-	github.com/mitchellh/reflectwalk v1.0.1 // indirect
+	github.com/hashicorp/terraform v0.12.19
+	github.com/hashicorp/terraform-plugin-sdk v1.4.1
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
-	github.com/rickardl/go-artifactory/v2 v2.5.7
-	github.com/spf13/afero v1.2.2 // indirect
+	github.com/rickardl/go-artifactory/v2 v2.5.9
 	github.com/stretchr/testify v1.4.0
 	github.com/ulikunitz/xz v0.5.6 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect

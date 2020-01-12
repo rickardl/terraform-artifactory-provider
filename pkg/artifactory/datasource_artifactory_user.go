@@ -1,17 +1,16 @@
 package artifactory
 
 import (
+	"context"
+	"net/http"
+
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/rickardl/go-artifactory/v2/artifactory"
 )
 
 func dataSourceArtifactoryUser() *schema.Resource {
 	return &schema.Resource{
-		Read:   resourceUserRead,
-		Exists: resourceUserExists,
-
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
+		Read: dataUserRead,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -60,4 +59,19 @@ func dataSourceArtifactoryUser() *schema.Resource {
 			},
 		},
 	}
+}
+
+func dataUserRead(d *schema.ResourceData, m interface{}) error {
+	c := m.(*artifactory.Artifactory)
+
+	user, resp, err := c.V1.Security.GetUser(context.Background(), d.Id())
+	if resp.StatusCode == http.StatusNotFound {
+		d.SetId("")
+		return nil
+	} else if err != nil {
+		return err
+	}
+	d.SetId(*user.Name)
+
+	return packUser(user, d)
 }

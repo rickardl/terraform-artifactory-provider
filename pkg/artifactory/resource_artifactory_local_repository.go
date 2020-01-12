@@ -3,7 +3,6 @@ package artifactory
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -188,13 +187,11 @@ func resourceLocalRepositoryCreate(d *schema.ResourceData, m interface{}) error 
 
 func resourceLocalRepositoryRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*artifactory.Artifactory)
-	log.Printf("[DEBUG] Find Repo: %s", d.Id())
+
 	repo, resp, err := c.V1.Repositories.GetLocal(context.Background(), d.Id())
 
 	if resp.StatusCode == http.StatusNotFound {
 		d.SetId("")
-		log.Printf("[DEBUG] Local Repo: %s does not exist", *repo.Key)
-
 	} else if err == nil {
 		hasErr := false
 		logError := cascadingErr(&hasErr)

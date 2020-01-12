@@ -14,49 +14,50 @@ import (
 // Artifactory Provider that supports configuration via username+password or a token
 // Supported resources are repos, users, groups, replications, and permissions
 func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
-		Schema: map[string]*schema.Schema{
-			"url": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("ARTIFACTORY_URL", nil),
-			},
-			"username": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_USERNAME", nil),
-				ConflictsWith: []string{"access_token", "api_key"},
-			},
-			"password": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_PASSWORD", nil),
-				ConflictsWith: []string{"access_token", "api_key"},
-			},
-			"token": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_TOKEN", nil),
-				ConflictsWith: []string{"api_key"},
-				Deprecated:    "Since v1.5. Renamed to api_key",
-			},
-			"api_key": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_API_KEY", nil),
-				ConflictsWith: []string{"username", "access_token", "password"},
-			},
-			"access_token": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_ACCESS_TOKEN", nil),
-				ConflictsWith: []string{"username", "api_key", "password"},
-			},
+
+	// The actual provider
+	provider := &schema.Provider{Schema: map[string]*schema.Schema{
+		"url": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("ARTIFACTORY_URL", nil),
 		},
+		"username": {
+			Type:          schema.TypeString,
+			Optional:      true,
+			DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_USERNAME", nil),
+			ConflictsWith: []string{"access_token", "api_key"},
+		},
+		"password": {
+			Type:          schema.TypeString,
+			Optional:      true,
+			Sensitive:     true,
+			DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_PASSWORD", nil),
+			ConflictsWith: []string{"access_token", "api_key"},
+		},
+		"token": {
+			Type:          schema.TypeString,
+			Optional:      true,
+			Sensitive:     true,
+			DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_TOKEN", nil),
+			ConflictsWith: []string{"api_key"},
+			Deprecated:    "Since v1.5. Renamed to api_key",
+		},
+		"api_key": {
+			Type:          schema.TypeString,
+			Optional:      true,
+			Sensitive:     true,
+			DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_API_KEY", nil),
+			ConflictsWith: []string{"username", "access_token", "password"},
+		},
+		"access_token": {
+			Type:          schema.TypeString,
+			Optional:      true,
+			Sensitive:     true,
+			DefaultFunc:   schema.EnvDefaultFunc("ARTIFACTORY_ACCESS_TOKEN", nil),
+			ConflictsWith: []string{"username", "api_key", "password"},
+		},
+	},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"artifactory_local_repository":          resourceArtifactoryLocalRepository(),
@@ -79,6 +80,9 @@ func Provider() terraform.ResourceProvider {
 
 		ConfigureFunc: providerConfigure,
 	}
+
+	return provider
+
 }
 
 // Creates the client for artifactory, will prefer token auth over basic auth if both set
